@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Class Outline
 Bundle-SymbolicName: com.adtbook.classOutline;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.adtbook.classOutline.Activator
+Bundle-Activator: com.abapblog.classicOutline.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  com.sap.conn.jco,

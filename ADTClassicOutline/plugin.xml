@@ -6,7 +6,7 @@
       <view
             allowMultiple="false"
             category="com.sap.adt.views"
-            class="com.adtbook.classOutline.views.View"
+            class="com.abapblog.classicOutline.views.View"
             icon="platform:/plugin/org.eclipse.ui.views/icons/full/eview16/outline_co.png"
             id="com.adtbook.classOutline.view"
             inject="true"
@@ -17,12 +17,12 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="com.adtbook.classOutline.views.LinkWithEditorHandler"
+            defaultHandler="com.abapblog.classicOutline.views.LinkWithEditorHandler"
             description="Link With Editor"
             id="com.adtbook.classOutline.LinkWithEditor"
             name="Link With Editor">
          <state
-               class="com.adtbook.classOutline.views.LinkWithEditorState"
+               class="com.abapblog.classicOutline.views.LinkWithEditorState"
                id="org.eclipse.ui.commands.toggleState">
          </state>
       </command>
@@ -50,14 +50,14 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="com.adtbook.classOutline.preferences.PreferenceInitilizer">
+            class="com.abapblog.classicOutline.preferences.PreferenceInitilizer">
       </initializer>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
             category="ADT Book"
-            class="com.adtbook.classOutline.preferences.PreferencePage"
+            class="com.abapblog.classicOutline.preferences.PreferencePage"
             id="com.adtbook.classOutline.preferencePage"
             name="Class Outline">
       </page>
