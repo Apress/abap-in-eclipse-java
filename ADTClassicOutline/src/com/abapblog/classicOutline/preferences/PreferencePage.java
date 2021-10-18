@@ -15,7 +15,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		super(GRID);
 		store = Activator.getDefault().getPreferenceStore();
 		setPreferenceStore(store);
-		setDescription("Class Outline Settings");
+		setDescription("Classic Outline Settings");
 	}
 
 	@Override

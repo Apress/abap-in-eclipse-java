@@ -1,6 +1,6 @@
 package com.abapblog.classicOutline.tree;
 
-public class ClassNode {
+public class SourceNode {
 	public static String fieldNameType = "TYPE";
 	public static String fieldNameName = "NAME";
 	public static String fieldNameId = "ID";
@@ -20,8 +20,9 @@ public class ClassNode {
 	private String text2 = "";
 	private String text8 = "";
 	private String text9 = "";
+	private int index;
 
-	public ClassNode(int id) {
+	public SourceNode(int id) {
 		this.id = id;
 	}
 
@@ -91,6 +92,14 @@ public class ClassNode {
 
 	public void setText9(String text9) {
 		this.text9 = text9;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
 	}
 
 }

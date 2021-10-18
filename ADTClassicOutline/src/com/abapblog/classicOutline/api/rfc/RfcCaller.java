@@ -1,11 +1,10 @@
 package com.abapblog.classicOutline.api.rfc;
 
-import org.eclipse.core.resources.IProject;
-
 import com.abapblog.classicOutline.api.IApiCaller;
-import com.abapblog.classicOutline.tree.ClassTree;
+import com.abapblog.classicOutline.tree.ObjectTree;
 import com.abapblog.classicOutline.tree.TreeNode;
 import com.abapblog.classicOutline.utils.ProjectUtility;
+import com.abapblog.classicOutline.views.LinkedObject;
 import com.sap.conn.jco.AbapException;
 import com.sap.conn.jco.JCoDestination;
 import com.sap.conn.jco.JCoDestinationManager;
@@ -16,30 +15,33 @@ import com.sap.conn.jco.JCoTable;
 public class RfcCaller implements IApiCaller {
 
 	@Override
-	public ClassTree getClassTree(String className, IProject project, boolean forceRefresh) {
+	public ObjectTree getObjectTree(LinkedObject linkedObject, boolean forceRefresh) {
 
-		ClassTree rfcClassTree = getClassTree(className, project);
+		ObjectTree rfcObjectTree = getObjectTree(linkedObject);
 
-		if (forceRefresh == false & rfcClassTree != null) {
-			return rfcClassTree;
+		if (forceRefresh == false & rfcObjectTree != null) {
+			return rfcObjectTree;
 		}
-		return getNewClassTree(className, project);
+		return getNewObjectTree(linkedObject);
 
 	}
 
 	@Override
-	public ClassTree getNewClassTree(String className, IProject project) {
+	public ObjectTree getNewObjectTree(LinkedObject linkedObject) {
 		try {
-			String destinationId = ProjectUtility.getDestinationID(project);
+			String destinationId = ProjectUtility.getDestinationID(linkedObject.getProject());
 			JCoDestination destination = JCoDestinationManager.getDestination(destinationId);
-			JCoFunction function = destination.getRepository().getFunction("Z_ADT_BOOK_GET_TREE_FOR_CLASS");
+			JCoFunction function = destination.getRepository().getFunction("Z_ADTCO_GET_OBJECT_TREE");
 			if (function == null)
-				throw new RuntimeException("Z_ADT_BOOK_GET_TREE_FOR_CLASS not found.");
-			function.getImportParameterList().getField("CLASS_NAME").setValue(className.toUpperCase());
+				throw new RuntimeException("Z_ADTCO_GET_OBJECT_TREE not found. "
+						+ "This plugin needs a ABAP Backend components that have to be installed in the system in order to use it."
+						+ "Use abapGit to install repository from https://github.com/fidley/ADT-Classic-Outline-Backend");
+			function.getImportParameterList().getField("OBJECT_NAME").setValue(linkedObject.getName());
+			function.getImportParameterList().getField("OBJECT_TYPE").setValue(linkedObject.getType());
 			try {
 				function.execute(destination);
-				JCoTable classTree = function.getExportParameterList().getTable("TREE");
-				return RfcClassTreeContentHandler.deserialize(className, project, classTree);
+				JCoTable objectTree = function.getExportParameterList().getTable("TREE");
+				return RfcObjectTreeContentHandler.deserialize(linkedObject, objectTree);
 			} catch (AbapException e) {
 				System.out.println(e.toString());
 				return null;
@@ -53,11 +55,13 @@ public class RfcCaller implements IApiCaller {
 	}
 
 	@Override
-	public ClassTree getClassTree(String className, IProject project) {
+	public ObjectTree getObjectTree(LinkedObject linkedObject) {
 		int count = 0;
-		while (classList.size() > count) {
-			ClassTree rfcClassTree = classList.get(count);
-			if (rfcClassTree.getClassName() == className && rfcClassTree.getProject().getName() == project.getName()) {
+		while (objectsList.size() > count) {
+			ObjectTree rfcClassTree = objectsList.get(count);
+			if (rfcClassTree.getLinkedObject().getName() == linkedObject.getName()
+					&& rfcClassTree.getLinkedObject().getProject().getName() == linkedObject.getProject().getName()
+					&& rfcClassTree.getLinkedObject().getType() == linkedObject.getType()) {
 				return rfcClassTree;
 			}
 			count++;
@@ -67,17 +71,19 @@ public class RfcCaller implements IApiCaller {
 
 	@Override
 	public String getUriForTreeNode(TreeNode treeNode) {
-		IProject project = treeNode.getProject();
-		String className = treeNode.getClassName();
-		String destinationId = ProjectUtility.getDestinationID(project);
+		LinkedObject linkedObject = treeNode.getLinkedObject();
+		String destinationId = ProjectUtility.getDestinationID(linkedObject.getProject());
 		try {
 			JCoDestination destination = JCoDestinationManager.getDestination(destinationId);
-			JCoFunction function = destination.getRepository().getFunction("Z_ADT_BOOK_GET_URI_FOR_NODE");
+			JCoFunction function = destination.getRepository().getFunction("Z_ADTCO_GET_URI_FOR_TREE_NODE");
 			if (function == null)
-				throw new RuntimeException("Z_ADT_BOOK_GET_URI_FOR_NODE not found.");
+				throw new RuntimeException("Z_ADTCO_GET_URI_FOR_TREE_NODE not found."
+						+ "This plugin needs a ABAP Backend components that have to be installed in the system in order to use it."
+						+ "Use abapGit to install repository from https://github.com/fidley/ADT-Classic-Outline-Backend");
 
-			function.getImportParameterList().getField("CLASS_NAME").setValue(className.toUpperCase());
-			RfcClassNodeContentHandler.serialize(treeNode.getSourceNode(),
+			function.getImportParameterList().getField("OBJECT_NAME").setValue(linkedObject.getName());
+			function.getImportParameterList().getField("OBJECT_TYPE").setValue(linkedObject.getType());
+			RfcObjectNodeContentHandler.serialize(treeNode.getSourceNode(),
 					function.getImportParameterList().getStructure("NODE"));
 
 			try {

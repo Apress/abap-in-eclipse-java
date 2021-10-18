@@ -2,14 +2,14 @@ package com.abapblog.classicOutline.tree;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.resources.IProject;
+import com.abapblog.classicOutline.views.LinkedObject;
 
 public class TreeParent extends TreeNode {
 
 	private ArrayList<TreeNode> children = new ArrayList<TreeNode>();
 
-	public TreeParent(String className, IProject project, ClassNode sourceNode) {
-		super(className, project, sourceNode);
+	public TreeParent(LinkedObject linkedObject, SourceNode sourceNode) {
+		super(linkedObject, sourceNode);
 		children = new ArrayList<TreeNode>();
 	}
 

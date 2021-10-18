@@ -1,37 +1,34 @@
 package com.abapblog.classicOutline.tree;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.part.MultiPageEditorPart;
 
 import com.abapblog.classicOutline.api.ApiCallerFactory;
 import com.abapblog.classicOutline.utils.ClassPageChangeListener;
 import com.abapblog.classicOutline.utils.ProjectUtility;
+import com.abapblog.classicOutline.views.LinkedObject;
 import com.abapblog.classicOutline.views.View;
 import com.sap.adt.oo.ui.classes.IMultiPageClassEditor;
-import com.sap.adt.tools.abapsource.ui.sources.editors.IAbapSourcePage;
 
 @SuppressWarnings("restriction")
 public class TreeContentProvider implements ITreeContentProvider {
 	private TreeParent invisibleRoot;
-	private String className = "";
-	private IProject project;
+	private LinkedObject linkedObject;
 	private Object[] elements;
 	private boolean refreshTree = false;
 	private org.eclipse.jface.viewers.TreePath[] treePaths;
 	private View view;
 
-	public TreeContentProvider(String className, IProject project, View view) {
+	public TreeContentProvider(LinkedObject linkedObject, View view) {
 		super();
-		setClassName(className);
-		setProject(project);
+		this.setLinkedObject(linkedObject);
 		addClassPageListener();
 		setView(view);
+
 	}
 
 	private void addClassPageListener() {
-		if (className == null || className.isEmpty())
+		if (getLinkedObject() == null || getLinkedObject().isEmpty())
 			return;
 		IEditorPart activeEditor = ProjectUtility.getActiveEditor();
 		if (activeEditor instanceof IMultiPageClassEditor) {
@@ -75,29 +72,13 @@ public class TreeContentProvider implements ITreeContentProvider {
 		setRefreshTree(false);
 
 		try {
-			invisibleRoot = new TreeParent(className, project, null);
-			if (project == null || className == null || className.isEmpty())
+			invisibleRoot = new TreeParent(getLinkedObject(), null);
+			if (getLinkedObject() == null || getLinkedObject().isEmpty())
 				return;
-			invisibleRoot = ApiCallerFactory.getCaller().getClassTree(className, project, refresh);
+			invisibleRoot = ApiCallerFactory.getCaller().getObjectTree(getLinkedObject(), refresh);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public String getClassName() {
-		return className;
-	}
-
-	public IProject getProject() {
-		return project;
-	}
-
-	public void setProject(IProject project) {
-		this.project = project;
-	}
-
-	public void setClassName(String className) {
-		this.className = className;
 	}
 
 	public Object[] getElements() {
@@ -130,6 +111,14 @@ public class TreeContentProvider implements ITreeContentProvider {
 
 	public void setView(View view) {
 		this.view = view;
+	}
+
+	public LinkedObject getLinkedObject() {
+		return linkedObject;
+	}
+
+	public void setLinkedObject(LinkedObject linkedObject) {
+		this.linkedObject = linkedObject;
 	}
 
 }

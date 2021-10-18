@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Class Outline
-Bundle-SymbolicName: com.adtbook.classOutline;singleton:=true
+Bundle-Name: Classic Outline
+Bundle-SymbolicName: com.abapblog.classicOutline;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.abapblog.classicOutline.Activator
 Require-Bundle: org.eclipse.ui,
@@ -27,9 +27,10 @@ Require-Bundle: org.eclipse.ui,
  com.sap.adt.destinations.ui;bundle-version="3.16.0",
  com.sap.adt.communication,
  org.eclipse.ui.workbench,
- com.sap.adt.ris.search
+ com.sap.adt.ris.search,
+ com.sap.adt.activation.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8,
  JavaSE-15
-Automatic-Module-Name: com.adtbook.classOutline
+Automatic-Module-Name: com.abapblog.classicOutline
 Bundle-ActivationPolicy: lazy
 Import-Package: com.sap.adt.sapgui.ui.editors

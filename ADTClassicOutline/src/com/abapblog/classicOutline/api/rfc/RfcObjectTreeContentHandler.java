@@ -1,31 +1,31 @@
 package com.abapblog.classicOutline.api.rfc;
 
-import org.eclipse.core.resources.IProject;
-
-import com.abapblog.classicOutline.tree.ClassNode;
-import com.abapblog.classicOutline.tree.ClassTree;
+import com.abapblog.classicOutline.tree.ObjectTree;
+import com.abapblog.classicOutline.tree.SourceNode;
+import com.abapblog.classicOutline.views.LinkedObject;
 import com.sap.conn.jco.JCoTable;
 
-public class RfcClassTreeContentHandler {
+public class RfcObjectTreeContentHandler {
 
-	public static ClassTree deserialize(String className, IProject project, JCoTable rfcTable) {
-		ClassTree newClassTree = new ClassTree(className, project);
+	public static ObjectTree deserialize(LinkedObject linkedObject, JCoTable rfcTable) {
+		ObjectTree newObjectTree = new ObjectTree(linkedObject);
 		if (rfcTable == null)
 			return null;
 		for (int i = 0; i < rfcTable.getNumRows(); i++) {
 			rfcTable.setRow(i);
-			ClassNode classNode = new ClassNode(rfcTable.getInt(ClassNode.fieldNameId));
-			classNode.setChild(rfcTable.getInt(ClassNode.fieldNameChild));
-			classNode.setParent(rfcTable.getInt(ClassNode.fieldNameParent));
-			classNode.setType(rfcTable.getString(ClassNode.fieldNameType));
-			classNode.setName(rfcTable.getString(ClassNode.fieldNameName));
-			classNode.setText1(rfcTable.getString(ClassNode.fieldNameText1));
-			classNode.setText2(rfcTable.getString(ClassNode.fieldNameText2));
-			classNode.setText8(rfcTable.getString(ClassNode.fieldNameText8));
-			classNode.setText9(rfcTable.getString(ClassNode.fieldNameText9));
-			newClassTree.addChild(classNode);
+			SourceNode sourceNode = new SourceNode(rfcTable.getInt(SourceNode.fieldNameId));
+			sourceNode.setChild(rfcTable.getInt(SourceNode.fieldNameChild));
+			sourceNode.setParent(rfcTable.getInt(SourceNode.fieldNameParent));
+			sourceNode.setType(rfcTable.getString(SourceNode.fieldNameType));
+			sourceNode.setName(rfcTable.getString(SourceNode.fieldNameName));
+			sourceNode.setText1(rfcTable.getString(SourceNode.fieldNameText1));
+			sourceNode.setText2(rfcTable.getString(SourceNode.fieldNameText2));
+			sourceNode.setText8(rfcTable.getString(SourceNode.fieldNameText8));
+			sourceNode.setText9(rfcTable.getString(SourceNode.fieldNameText9));
+			sourceNode.setIndex(i);
+			newObjectTree.addChild(sourceNode);
 		}
-		return newClassTree;
+		return newObjectTree;
 	}
 
 }

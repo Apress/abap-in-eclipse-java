@@ -3,7 +3,6 @@ package com.abapblog.classicOutline.api;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.abapblog.classicOutline.Activator;
-import com.abapblog.classicOutline.api.rest.RestApiCaller;
 import com.abapblog.classicOutline.api.rfc.RfcCaller;
 import com.abapblog.classicOutline.preferences.PreferenceInitilizer;
 
@@ -15,10 +14,6 @@ public class ApiCallerFactory {
 		switch (apiCallType) {
 		case PreferenceInitilizer.APIJCoCall: {
 			return new RfcCaller();
-
-		}
-		case PreferenceInitilizer.APIRestCall: {
-			return new RestApiCaller();
 		}
 		}
 		return null;

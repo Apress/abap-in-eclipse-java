@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.TreePath;
@@ -15,40 +14,47 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.swt.widgets.Display;
 
 import com.abapblog.classicOutline.tree.TreeCellLabelProvider;
 import com.abapblog.classicOutline.tree.TreeContentProvider;
 import com.abapblog.classicOutline.tree.TreeDoubleClickListener;
+import com.abapblog.classicOutline.tree.TreePatternFilter;
 import com.abapblog.classicOutline.utils.ProjectUtility;
+import com.sap.adt.activation.ui.IActivationSuccessListener;
 import com.sap.adt.destinations.logon.notification.ILoggedOnEvent;
 import com.sap.adt.destinations.logon.notification.ILogonListener;
-import com.sap.adt.destinations.model.IDestinationData;
-import com.sap.adt.tools.core.project.AdtProjectServiceFactory;
+import com.sap.adt.tools.abapsource.ui.sources.editors.IAbapSourcePage;
+import com.sap.adt.tools.core.IAdtObjectReference;
 
-public class View extends ViewPart implements ILinkedWithEditorView {
-	private TreeViewer viewer;
-	private TreeContentProvider contentProvider;
+public class View extends ViewPart
+		implements ILinkedWithEditorView, ILogonListener, IAbapPageLoadListener, IActivationSuccessListener {
+	private static Long changeDate;
+	protected static TreeViewer viewer;
+	private static TreeContentProvider contentProvider;
 	private Composite parent;
+	private static final List<String> destinationListenerInfo = new ArrayList<>();
 	protected IPartListener2 linkWithEditorPartListener = new LinkWithEditorPartListener(this);
-	private IProject LinkedProject;
-	private String LinkedClass;
+	public LinkedObject linkedObject = new LinkedObject(null, null);
 	private ArrayList<TreeContentProvider> contentProviders = new ArrayList<TreeContentProvider>();
+	private Boolean pageLoadListenerAdded = false;
 
 	@Override
 	public void createPartControl(Composite parent) {
 
 		this.parent = parent;
-		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		contentProvider = getContentProvider(LinkedClass, LinkedProject);
+		TreePatternFilter filter = new TreePatternFilter();
+
+		final FilteredTree filteredTree = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL, filter,
+				true, true);
+		viewer = filteredTree.getViewer();
+		linkedObject = ProjectUtility.getObjectFromEditor();
+		contentProvider = getContentProvider(linkedObject);
 		viewer.setContentProvider(contentProvider);
 		setTreeProperties();
 		createColumns();
@@ -83,20 +89,23 @@ public class View extends ViewPart implements ILinkedWithEditorView {
 	@Override
 	public void setFocus() {
 		parent.setFocus();
-		if ((LinkedClass.isEmpty() && (isLinkingActive()))) {
-			LinkedProject = ProjectUtility.getActiveAdtProject();
+		refreshObjectTree();
+
+	}
+
+	private void refreshObjectTree() {
+		if ((linkedObject != null && linkedObject.isEmpty() && (isLinkingActive()))) {
+			IProject LinkedProject = ProjectUtility.getActiveAdtProject();
 			if (LinkedProject == null)
 				return;
-	//		ProjectUtility.ensureLoggedOn(LinkedProject);
-			LinkedClass = ProjectUtility.getClassNameFromEditor();
-			if (LinkedClass.isEmpty())
+			linkedObject = ProjectUtility.getObjectFromEditor();
+			if (linkedObject == null || linkedObject.isEmpty())
 				return;
-			contentProvider = getContentProvider(LinkedClass, LinkedProject);
+			contentProvider = getContentProvider(linkedObject);
 			getViewer().setContentProvider(contentProvider);
 			treeViewerRefresh();
 			getViewer().expandToLevel(2);
 		}
-
 	}
 
 	public void treeViewerRefresh() {
@@ -106,20 +115,19 @@ public class View extends ViewPart implements ILinkedWithEditorView {
 	@Override
 	public void editorActivated(IEditorPart activeEditor) {
 		if (isLinkingActive()) {
-			LinkedProject = ProjectUtility.getActiveAdtProject();
+			IProject LinkedProject = ProjectUtility.getActiveAdtProject();
 			if (LinkedProject == null)
 				return;
-			LinkedClass = ProjectUtility.getClassNameFromEditor(activeEditor);
-			if (LinkedClass.isEmpty())
+			linkedObject = ProjectUtility.getObjectFromEditor(activeEditor);
+			if (linkedObject == null || linkedObject.isEmpty())
 				return;
-			if (!LinkedClass.equals(contentProvider.getClassName())
-					|| (contentProvider.getProject() != null && LinkedProject != contentProvider.getProject())) {
+			if (!linkedObject.equals(contentProvider.getLinkedObject())) {
 				contentProvider.setElements(getViewer().getExpandedElements());
 				contentProvider.setTreePaths(getViewer().getExpandedTreePaths());
-				contentProvider = getContentProvider(LinkedClass, LinkedProject);
+				contentProvider = getContentProvider(linkedObject);
 				getViewer().setContentProvider(contentProvider);
-				expandTree();
 				treeViewerRefresh();
+				expandTree();
 			}
 		}
 	}
@@ -158,18 +166,17 @@ public class View extends ViewPart implements ILinkedWithEditorView {
 		getSite().getPage().addPartListener(this.linkWithEditorPartListener);
 	}
 
-	private TreeContentProvider getContentProvider(String className, IProject project) {
+	private TreeContentProvider getContentProvider(LinkedObject linkedObject) {
 		int count = 0;
 		while (getContentProviders().size() > count) {
 			TreeContentProvider contentProvider = getContentProviders().get(count);
-			if (className.equals(contentProvider.getClassName())
-					&& contentProvider.getProject().getName() == project.getName()) {
+			if (linkedObject != null && linkedObject.equals(contentProvider.getLinkedObject())) {
 				return contentProvider;
 			}
 			count++;
 		}
 
-		TreeContentProvider contentProvider = new TreeContentProvider(className, project, this);
+		TreeContentProvider contentProvider = new TreeContentProvider(linkedObject, this);
 		contentProvider.initialize();
 		getContentProviders().add(contentProvider);
 		return contentProvider;
@@ -190,4 +197,39 @@ public class View extends ViewPart implements ILinkedWithEditorView {
 	public TreeViewer getViewer() {
 		return viewer;
 	}
+
+	@Override
+	public void loggedOn(ILoggedOnEvent loggedOnEvent, IProgressMonitor progressMonitor) {
+		String destId = loggedOnEvent.getDestinationData().getId();
+		int test = destinationListenerInfo.indexOf(destId);
+		if (destinationListenerInfo.indexOf(destId) == -1) {
+			System.out.println("LoggedOnEvent: " + destId);
+			destinationListenerInfo.add(destId);
+			AbapPageLoadListener.addListener(this);
+		}
+
+	}
+
+	@Override
+	public void pageLoaded(IAbapSourcePage sourcePage) {
+		reloadOutlineContent();
+	}
+
+	@Override
+	public void onActivationSuccess(List<IAdtObjectReference> adtObject, IProject project) {
+		reloadOutlineContent();
+
+	}
+
+	private void reloadOutlineContent() {
+		linkedObject = ProjectUtility.getObjectFromEditor();
+		contentProvider.setElements(getViewer().getExpandedElements());
+		contentProvider.setTreePaths(getViewer().getExpandedTreePaths());
+		contentProvider = getContentProvider(linkedObject);
+		contentProvider.setRefreshTree(true);
+		contentProvider.initialize();
+		getViewer().setContentProvider(contentProvider);
+		treeViewerRefresh();
+		expandTree();
+	};
 }

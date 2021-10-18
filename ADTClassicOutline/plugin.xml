@@ -8,9 +8,9 @@
             category="com.sap.adt.views"
             class="com.abapblog.classicOutline.views.View"
             icon="platform:/plugin/org.eclipse.ui.views/icons/full/eview16/outline_co.png"
-            id="com.adtbook.classOutline.view"
-            inject="true"
-            name="Class Outline"
+            id="com.abapblog.classicOutline.view"
+            inject="false"
+            name="Classic Outline"
             restorable="true">
       </view>
    </extension>
@@ -19,7 +19,7 @@
       <command
             defaultHandler="com.abapblog.classicOutline.views.LinkWithEditorHandler"
             description="Link With Editor"
-            id="com.adtbook.classOutline.LinkWithEditor"
+            id="com.abapblog.classicOutline.LinkWithEditor"
             name="Link With Editor">
          <state
                class="com.abapblog.classicOutline.views.LinkWithEditorState"
@@ -30,22 +30,9 @@
    <extension
          point="org.eclipse.ui.commandImages">
       <image
-            commandId="com.adtbook.classOutline.LinkWithEditor"
+            commandId="com.abapblog.classicOutline.LinkWithEditor"
             icon="platform:/plugin/org.eclipse.ui.ide/icons/full/elcl16/synced.png">
       </image>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            allPopups="false"
-            locationURI="toolbar:com.adtbook.classOutline.view">
-         <command
-               commandId="com.adtbook.classOutline.LinkWithEditor"
-               icon="platform:/plugin/org.eclipse.ui.ide/icons/full/elcl16/synced.png"
-               label="Link With Editor"
-               style="toggle">
-         </command>
-      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -54,13 +41,21 @@
       </initializer>
    </extension>
    <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            category="ADT Book"
-            class="com.abapblog.classicOutline.preferences.PreferencePage"
-            id="com.adtbook.classOutline.preferencePage"
-            name="Class Outline">
-      </page>
+         point="com.sap.adt.destinations.logonListeners">
+      <listener
+            class="com.abapblog.classicOutline.views.View">
+      </listener>
    </extension>
-
+      <extension
+         point="com.sap.adt.tools.abapsource.ui.processAfterSourcePageLoaded">
+      <class
+            name="com.abapblog.classicOutline.views.AbapPageLoadListener">
+      </class>
+   </extension>
+      <extension
+         point="com.sap.adt.activation.ui.activationSuccessListener">
+      <onActivationSuccess
+            class="com.abapblog.classicOutline.views.View">
+      </onActivationSuccess>
+   </extension>
 </plugin>

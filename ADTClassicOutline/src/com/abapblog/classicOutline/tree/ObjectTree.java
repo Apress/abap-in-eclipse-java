@@ -2,38 +2,50 @@ package com.abapblog.classicOutline.tree;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.resources.IProject;
+import com.abapblog.classicOutline.views.LinkedObject;
 
-public class ClassTree extends TreeParent {
+public class ObjectTree extends TreeParent {
 	private ArrayList<TreeNode> treeNodes = new ArrayList<TreeNode>();
 
-	public ClassTree(String className, IProject project) {
-		super(className, project, null);
+	public ObjectTree(LinkedObject linkedobject) {
+		super(linkedobject, null);
 		this.setSourceNode(createRootNode());
 		treeNodes.add(this);
 	}
 
-	private ClassNode createRootNode() {
-		ClassNode classRoot = new ClassNode(0);
+	private SourceNode createRootNode() {
+		SourceNode classRoot = new SourceNode(0);
 		setName("ROOT");
 		setDescription("ROOT");
 		setId(0);
 		return classRoot;
 	}
 
-	public void addChild(ClassNode sourceNode) {
+	private TreeNode getParentByID(int id) {
+		for (TreeNode node : treeNodes) {
+			if (node.getId() == id)
+				return node;
+		}
+		return null;
+	}
+
+	public void addChild(SourceNode sourceNode) {
 		TreeParent parentNode;
 		TreeNode newNode;
 		TreeParent newParentNode;
 		if (sourceNode.getChild() == 0) {
-			newNode = new TreeNode(getClassName(), getProject(), sourceNode);
+			newNode = new TreeNode(super.getLinkedObject(), sourceNode);
 			treeNodes.add(newNode);
-			parentNode = (TreeParent) treeNodes.get(sourceNode.getParent());
-			parentNode.addChild(newNode);
+			try {
+				parentNode = (TreeParent) getParentByID(sourceNode.getParent());
+				parentNode.addChild(newNode);
+			} catch (Exception e) {
+				System.out.print(e.getMessage());
+			}
 		} else {
-			newParentNode = new TreeParent(getClassName(), getProject(), sourceNode);
+			newParentNode = new TreeParent(super.getLinkedObject(), sourceNode);
 			treeNodes.add(newParentNode);
-			parentNode = (TreeParent) treeNodes.get(sourceNode.getParent());
+			parentNode = (TreeParent) getParentByID(sourceNode.getParent());
 			parentNode.addChild(newParentNode);
 		}
 

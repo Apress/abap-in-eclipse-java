@@ -2,19 +2,18 @@ package com.abapblog.classicOutline.api;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.resources.IProject;
-
-import com.abapblog.classicOutline.tree.ClassTree;
+import com.abapblog.classicOutline.tree.ObjectTree;
 import com.abapblog.classicOutline.tree.TreeNode;
+import com.abapblog.classicOutline.views.LinkedObject;
 
 public interface IApiCaller {
-	static ArrayList<ClassTree> classList = new ArrayList<ClassTree>();
+	static ArrayList<ObjectTree> objectsList = new ArrayList<ObjectTree>();
 
-	public ClassTree getClassTree(String className, IProject project, boolean forceRefresh);
+	public ObjectTree getObjectTree(LinkedObject linkedObject, boolean forceRefresh);
 
-	public ClassTree getNewClassTree(String className, IProject project);
+	public ObjectTree getNewObjectTree(LinkedObject linkedObject);
 
-	public ClassTree getClassTree(String className, IProject project);
+	public ObjectTree getObjectTree(LinkedObject linkedObject);
 
 	public String getUriForTreeNode(TreeNode treeNode);
 

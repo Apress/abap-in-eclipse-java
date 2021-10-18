@@ -17,12 +17,12 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
+import com.abapblog.classicOutline.views.LinkedObject;
 import com.sap.adt.destinations.logon.AdtLogonServiceFactory;
 import com.sap.adt.destinations.model.IAuthenticationToken;
 import com.sap.adt.destinations.model.IDestinationData;
 import com.sap.adt.destinations.model.internal.AuthenticationToken;
 import com.sap.adt.destinations.ui.logon.AdtLogonServiceUIFactory;
-import com.sap.adt.oo.ui.classes.IMultiPageClassEditor;
 import com.sap.adt.project.AdtCoreProjectServiceFactory;
 import com.sap.adt.project.IAdtCoreProject;
 import com.sap.adt.project.ui.util.ProjectUtil;
@@ -39,6 +39,7 @@ import com.sap.adt.tools.core.model.adtcore.IAdtObject;
 import com.sap.adt.tools.core.model.adtcore.IAdtObjectReference;
 import com.sap.adt.tools.core.project.IAbapProject;
 import com.sap.adt.tools.core.ui.dialogs.AbapProjectSelectionDialog;
+import com.sap.adt.tools.core.ui.editors.IAdtFormEditor;
 import com.sap.adt.tools.core.ui.navigation.AdtNavigationServiceFactory;
 import com.sap.adt.tools.core.wbtyperegistry.WorkbenchAction;
 
@@ -64,14 +65,14 @@ public class ProjectUtility {
 		return destinationId;
 	}
 
-	public static String getClassNameFromEditor(IEditorPart editor) {
-		if (editor instanceof IMultiPageClassEditor) {
-			IMultiPageClassEditor classEditor = (IMultiPageClassEditor) editor;
-			if (classEditor.getModel() != null) {
-				return classEditor.getModel().getName();
+	public static LinkedObject getObjectFromEditor(IEditorPart editor) {
+		if (editor instanceof IAdtFormEditor) {
+			IAdtFormEditor formEditor = (IAdtFormEditor) editor;
+			if (formEditor.getModel() != null) {
+				return new LinkedObject(formEditor, getActiveAdtProject());
 			}
 		}
-		return "";
+		return null;
 	}
 
 	public static void ensureLoggedOn(IProject project) {
@@ -94,8 +95,8 @@ public class ProjectUtility {
 		}
 	}
 
-	public static String getClassNameFromEditor() {
-		return getClassNameFromEditor(getActiveEditor());
+	public static LinkedObject getObjectFromEditor() {
+		return getObjectFromEditor(getActiveEditor());
 	}
 
 	public static IAbapSourcePage getAbapSourcePage(IEditorPart editor) {

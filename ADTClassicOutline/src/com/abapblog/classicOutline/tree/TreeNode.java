@@ -1,12 +1,12 @@
 package com.abapblog.classicOutline.tree;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import com.abapblog.classicOutline.api.ApiCallerFactory;
+import com.abapblog.classicOutline.views.LinkedObject;
 import com.sap.adt.tools.core.ui.AbapCoreUi;
 import com.sap.adt.tools.core.ui.IAdtObjectTypeInfoUi;
 
@@ -20,11 +20,10 @@ public class TreeNode implements IAdaptable {
 	private TreeParent parent;
 	private String adtUri;
 	private String visibility = "";
-	private String className = "";
-	private IProject project;
-	private ClassNode sourceNode;
+	private SourceNode sourceNode;
+	protected LinkedObject linkedObject;
 
-	public TreeNode(String className, IProject project, ClassNode sourceNode) {
+	public TreeNode(LinkedObject linkedObject, SourceNode sourceNode) {
 		try {
 			setId(sourceNode.getId());
 			setType(sourceNode.getType());
@@ -36,8 +35,7 @@ public class TreeNode implements IAdaptable {
 		} catch (Exception e) {
 			// TODO
 		}
-		setClassName(className);
-		setProject(project);
+		this.linkedObject = linkedObject;
 
 	}
 
@@ -142,66 +140,141 @@ public class TreeNode implements IAdaptable {
 	private String buildWorkbenchType(String treeNodeType, String visibility) {
 		String wbType;
 		switch (treeNodeType) {
-		case "COI": {
-			wbType = "INTF/" + treeNodeType.substring(1, treeNodeType.length());
-			return wbType;
+
+		case "CPO":
+		case "OPO": {
+			return "FUGR/PO";
 		}
+
+		case "CPM":
+		case "OPM": {
+			return "FUGR/PM";
+		}
+
+		case "CPY":
+		case "OPY": {
+			return "FUGR/PY";
+		}
+
+		case "CPN":
+		case "OPN": {
+			return "INTF/I";
+		}
+		case "OK": {
+			return "DEVC/K";
+		}
+		case "CPK":
+		case "OPK": {
+			return "FUGR/PK";
+		}
+
+		case "CFF":
+		case "OFF": {
+			return "FUGR/FF";
+		}
+		case "OF": {
+			return "FUGR/F";
+		}
+		case "CPG":
+		case "OPG": {
+			return "FUGR/PG";
+		}
+		case "CP":
+		case "OP": {
+			return "PROG/P";
+		}
+		case "CI":
+		case "OI": {
+			return "PROG/I";
+		}
+		case "CT":
+		case "OT": {
+			return "TRAN/T";
+		}
+		case "CPT":
+		case "OPT": {
+			return "PROG/PT";
+		}
+		case "CPS":
+		case "OPS": {
+			return "PROG/PS";
+		}
+		case "CPD":
+		case "OPD": {
+			return "PROG/PD";
+		}
+		case "CPE":
+		case "OPE": {
+			return "PROG/PE";
+		}
+		case "CPU":
+		case "OPU": {
+			return "PROG/PU";
+		}
+
+		case "BII": {
+			return "INTF/OI";
+		}
+		case "COI":
+		case "CIT":
+		case "OIT":
+		case "CIA":
+		case "OIA":
+		case "CIO":
+		case "OIO":
+		case "CPI":
+		case "OPI":
 		case "OOI": {
 			wbType = "INTF/" + treeNodeType.substring(1, treeNodeType.length());
 			return wbType;
 		}
 
-		case "OOL": {
+		case "CPL":
+		case "OPL":
+		case "OOL":
+		case "OOC":
+		case "COU":
+		case "COS": {
 			wbType = "CLAS/OC";
 			return wbType;
 		}
-		case "OOLD": {
-			wbType = "CLAS/OM";
-			break;
-		}
-
-		case "OOND": {
-			wbType = "CLAS/OM";
-			break;
-		}
+		case "COLD":
+		case "OOLD":
+		case "COND":
+		case "OOND":
+		case "COLI":
 		case "OOLI": {
 			wbType = "CLAS/OM";
 			break;
 		}
-		case "OOY": {
-			wbType = "CLAS/OT";
-			break;
-		}
 
+		case "COY":
+		case "OOY":
+		case "CONT":
+		case "OONT":
+		case "COLT":
 		case "OOLT": {
 			wbType = "CLAS/OT";
 			break;
 		}
-
+		case "COK":
 		case "OOK": {
 			return "CLAS/OK";
 		}
-
-		case "OOLN": {
-			return "INTF/OI";
-		}
-
+		case "COLN":
+		case "CONN":
+		case "OONN":
+		case "OOLN":
+		case "CON":
 		case "OON": {
 			return "INTF/OI";
 		}
 
-		case "OOLA": {
-			wbType = "CLAS/OA";
-			break;
-		}
-
+		case "COLA":
+		case "OOLA":
+		case "CONA":
 		case "OONA": {
 			wbType = "CLAS/OA";
-			break;
-		}
-
-		case "OONT": {
-			wbType = "CLAS/OT";
 			break;
 		}
 
@@ -209,35 +282,31 @@ public class TreeNode implements IAdaptable {
 			wbType = "CLAS/" + treeNodeType.substring(1, treeNodeType.length());
 		}
 		}
-		if (visibility.isEmpty()) {
+		if (visibility.isEmpty())
+
+		{
 			return wbType;
 		} else {
 			return wbType + "/" + visibility;
 		}
 	}
 
-	public String getClassName() {
-		return className;
-	}
-
-	public void setClassName(String className) {
-		this.className = className;
-	}
-
-	public IProject getProject() {
-		return project;
-	}
-
-	public void setProject(IProject project) {
-		this.project = project;
-	}
-
-	public ClassNode getSourceNode() {
+	public SourceNode getSourceNode() {
 		return sourceNode;
 	}
 
-	public void setSourceNode(ClassNode sourceNode) {
+	public void setSourceNode(SourceNode sourceNode) {
 		this.sourceNode = sourceNode;
+	}
+
+	public LinkedObject getLinkedObject() {
+		return linkedObject;
+	}
+
+	@Override
+	public String toString() {
+		return getName() + " " + getDescription() + " ";
+
 	}
 
 }
