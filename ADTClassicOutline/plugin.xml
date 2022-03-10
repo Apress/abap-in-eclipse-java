@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="com.sap.adt.views"
+            class="com.abapblog.classicOutline.views.View"
+            icon="platform:/plugin/org.eclipse.ui.views/icons/full/eview16/outline_co.png"
+            id="com.abapblog.classicOutline.view"
+            inject="false"
+            name="Classic Outline"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.abapblog.classicOutline.preferences.PreferenceInitilizer">
+      </initializer>
+   </extension>
+   <extension
+         point="com.sap.adt.destinations.logonListeners">
+      <listener
+            class="com.abapblog.classicOutline.views.LogonListenerHandler">
+      </listener>
+   </extension>
+      <extension
+         point="com.sap.adt.tools.abapsource.ui.processAfterSourcePageLoaded">
+      <class
+            name="com.abapblog.classicOutline.views.AbapPageLoadListener">
+      </class>
+   </extension>
+      <extension
+         point="com.sap.adt.activation.ui.activationSuccessListener">
+      <onActivationSuccess
+            class="com.abapblog.classicOutline.views.ActivationSuccessListenerHandler">
+      </onActivationSuccess>
+   </extension>
+</plugin>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="ADT_Classic_Outline_Feature"
+      label="ADT Classic Outline"
+      version="1.0.1.qualifier"
+      provider-name="Abapblog.com"
+      plugin="com.abapblog.branding"
+      license-feature="ABAP_Favorites_Feature_Project"
+      license-feature-version="1.0.60.qualifier">
+
+   <description>
+      Adds new view Classic Outline which works almost same like Outline
+in SE80.
+
+This plugin needs a ABAP Backend components that have to be installed in the system in order to use it.
+Use abapGit to install repository from https://github.com/fidley/ADT-Classic-Outline-Backend
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <url>
+      <update label="AbapBlog.com" url="http://abapblog.com/eclipse/plugin/ABAPFavorites"/>
+   </url>
+
+   <plugin
+         id="com.abapblog.classicOutline"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
