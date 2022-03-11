@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IProject;
 
 import com.abapblog.classicOutline.api.ApiCallerFactory;
+import com.abapblog.classicOutline.utils.ProjectUtility;
 import com.abapblog.classicOutline.utils.RegularExpressionUtils;
 import com.sap.adt.tools.core.model.adtcore.IAdtObject;
 import com.sap.adt.tools.core.ui.editors.IAdtFormEditor;
@@ -64,6 +65,9 @@ public class LinkedObject {
 	}
 
 	public IProject getProject() {
+		if (project == null) {
+			project = ProjectUtility.getActiveAdtProject();
+		}
 		return project;
 	}
 
