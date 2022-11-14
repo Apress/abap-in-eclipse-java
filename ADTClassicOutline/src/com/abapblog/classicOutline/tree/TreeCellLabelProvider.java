@@ -17,9 +17,14 @@ public class TreeCellLabelProvider extends StyledCellLabelProvider {
 		if (element instanceof TreeNode) {
 			TreeNode node = (TreeNode) element;
 			StyledString styledString = new StyledString(node.getName());
-			String decoration = " " + node.getDescription(); //$NON-NLS-1$
-			styledString.append(decoration, StyledString.COUNTER_STYLER);
 
+			if (node instanceof TreeParent) {
+				String counter = "";
+				counter = " " + addNumberOfChildrenToDecoration(counter, (TreeParent) node);
+				styledString.append(counter, StyledString.COUNTER_STYLER);
+			}
+			String decoration = " " + node.getDescription(); //$NON-NLS-1$
+			styledString.append(decoration, StyledString.DECORATIONS_STYLER);
 			cell.setText(styledString.toString());
 			cell.setStyleRanges(styledString.getStyleRanges());
 			cell.setImage(node.getImage());
@@ -28,9 +33,51 @@ public class TreeCellLabelProvider extends StyledCellLabelProvider {
 		super.update(cell);
 	}
 
+	private String addNumberOfChildrenToDecoration(String decoration, TreeParent parent) {
+
+		return "(" + getElementChilderNumber(parent) + ")" + decoration;
+	}
+
+	private int getElementChilderNumber(TreeParent parent) {
+		int numberOfElements = 0;
+		for (TreeNode child : parent.getChildren()) {
+			try {
+				if (!(child instanceof TreeParent) || isChildALocalClass(child)) {
+					++numberOfElements;
+				}
+			} catch (Exception e) {
+
+			}
+		}
+
+		for (TreeNode child : parent.getChildren()) {
+			try {
+				if (!isChildAClassMethod(child) && !isChildALocalClass(child))
+					numberOfElements = numberOfElements + getElementChilderNumber((TreeParent) child);
+			} catch (Exception e) {
+
+			}
+		}
+		return numberOfElements;
+
+	}
+
+	private boolean isChildAClassMethod(TreeNode child) {
+		return child.getType().equals("OOM");
+	}
+
+	private boolean isChildALocalClass(TreeNode child) {
+		switch (child.getType()) {
+		case "OOL":
+		case "OPL": {
+			return true;
+		}
+		}
+		return false;
+	}
+
 	@Override
 	protected void measure(Event event, Object element) {
 		super.measure(event, element);
 	}
-
 }

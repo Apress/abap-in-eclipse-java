@@ -64,4 +64,13 @@
                name="Run ATC">
          </command>
       </extension>
+      <extension
+            point="org.eclipse.ui.preferencePages">
+         <page
+               category="com.sap.adt.tools.core.ui.preferencePages.ABAP"
+               class="com.abapblog.classicOutline.preferences.PreferencePage"
+               id="com.abapblog.classicOutline.preferences.PreferencesPage"
+               name="Classic Outline">
+         </page>
+      </extension>
 </plugin>

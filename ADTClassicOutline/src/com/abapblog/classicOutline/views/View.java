@@ -1,5 +1,6 @@
 package com.abapblog.classicOutline.views;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +40,8 @@ public class View extends ViewPart implements ILinkedWithEditorView, ITreeConten
 	private static Composite container;
 	private static StackLayout layout;
 	public static View view;
-
 	@Override
+
 	public void createPartControl(Composite parent) {
 		this.parent = parent;
 		view = this;
@@ -67,6 +68,8 @@ public class View extends ViewPart implements ILinkedWithEditorView, ITreeConten
 		int count = 0;
 		while (filteredTrees.size() > count) {
 			OutlineFilteredTree filteredTree = filteredTrees.get(count);
+			if (linkedObject == null && filteredTree.containsObject(null))
+				return filteredTree;
 			if (linkedObject != null && filteredTree.containsObject(linkedObject)) {
 				if (refresh) {
 					TreeViewer viewer = filteredTree.getViewer();
@@ -154,7 +157,7 @@ public class View extends ViewPart implements ILinkedWithEditorView, ITreeConten
 
 	private void createColumns(TreeViewer viewer) {
 		TreeViewerColumn viewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
-		viewerColumn.getColumn().setWidth(500);
+		viewerColumn.getColumn().setWidth(700);
 		viewerColumn.getColumn().setText("Names");
 	}
 
@@ -322,5 +325,7 @@ public class View extends ViewPart implements ILinkedWithEditorView, ITreeConten
 			}
 		});
 	}
+
+
 
 }
