@@ -28,6 +28,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 //		addField(apiCallPreference);
 		addField(new BooleanFieldEditor(PreferenceConstants.P_FETCH_METHOD_REDEFINITIONS,
 				"&Fetch redefinitions for methods", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.P_LOAD_ALL_LEVELS_OF_REDEFINITIONS,
+				"&Load all levels of redefinitions for methods", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PreferenceConstants.P_LOAD_ALL_LEVELS_OF_SUBCLASSES,
 				"&Load all levels of subclasses", getFieldEditorParent()));
 	}

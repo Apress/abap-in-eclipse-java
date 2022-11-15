@@ -1,6 +1,5 @@
 package com.abapblog.classicOutline.views;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +16,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.part.ViewPart;
 
 import com.abapblog.classicOutline.tree.OutlineFilteredTree;
@@ -40,9 +41,12 @@ public class View extends ViewPart implements ILinkedWithEditorView, ITreeConten
 	private static Composite container;
 	private static StackLayout layout;
 	public static View view;
+	private SaveCommandListener saveCommandListener = new SaveCommandListener();
+
 	@Override
 
 	public void createPartControl(Composite parent) {
+		addSaveCommandListener();
 		this.parent = parent;
 		view = this;
 		if (container == null) {
@@ -54,6 +58,11 @@ public class View extends ViewPart implements ILinkedWithEditorView, ITreeConten
 		linkedObject = ProjectUtility.getObjectFromEditor();
 		if (linkedObject != null)
 			reloadOutlineContent(false, false, true);
+	}
+
+	private void addSaveCommandListener() {
+		ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
+		commandService.addExecutionListener(saveCommandListener);
 	}
 
 	private void getViewerForLinkedObject(Composite parent, LinkedObject linkedObject, boolean refresh) {
@@ -98,18 +107,21 @@ public class View extends ViewPart implements ILinkedWithEditorView, ITreeConten
 		List<Object> toExpand = new ArrayList<Object>();
 		Object[] currentNodes = contentProvider.getAllElements();
 		for (int i = 0; i < elementToExpand.length; i++) {
-			TreeParent nodeToExpand = (TreeParent) elementToExpand[i];
-			for (int count = 0; count < currentNodes.length; count++) {
-				try {
-					TreeParent currentNode = (TreeParent) currentNodes[count];
-					if (currentNode.hashCode() == nodeToExpand.hashCode()) {
-						toExpand.add(currentNode);
+			try {
+				TreeParent nodeToExpand = (TreeParent) elementToExpand[i];
+				for (int count = 0; count < currentNodes.length; count++) {
+					try {
+						TreeParent currentNode = (TreeParent) currentNodes[count];
+						if (currentNode.hashCode() == nodeToExpand.hashCode()) {
+							toExpand.add(currentNode);
+						}
+					} catch (Exception e) {
+
 					}
-				} catch (Exception e) {
-
 				}
-			}
+			} catch (Exception e) {
 
+			}
 		}
 		if (toExpand.size() > 0) {
 			viewer.setExpandedElements(toExpand.toArray());
@@ -198,6 +210,12 @@ public class View extends ViewPart implements ILinkedWithEditorView, ITreeConten
 	@Override
 	public void editorActivated(IEditorPart activeEditor) {
 		if (isLinkingActive()) {
+
+//			IAdtFormEditor formEditor = (IAdtFormEditor) activeEditor;
+//			IAbapSourcePage test = (IAbapSourcePage) formEditor.getSelectedPage();
+//			test.getDocumentProvider().addElementStateListener(new AbapStateChangeListener());
+//			// formEditor.getDocumentProvider().addElementStateListener(new
+//			// AbapStateChangeListener());
 			IProject LinkedProject = ProjectUtility.getActiveAdtProject();
 			if (LinkedProject == null)
 				return;
@@ -221,10 +239,16 @@ public class View extends ViewPart implements ILinkedWithEditorView, ITreeConten
 	@Override
 	public void dispose() {
 		getSite().getPage().removePartListener(this.linkWithEditorPartListener);
+		removeSaveCommandListener();
 		currentTree = null;
 		container = null;
 		filteredTrees = new ArrayList<OutlineFilteredTree>();
 		super.dispose();
+	}
+
+	private void removeSaveCommandListener() {
+		ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
+		commandService.removeExecutionListener(saveCommandListener);
 	}
 
 	public boolean isLinkingActive() {
@@ -325,7 +349,5 @@ public class View extends ViewPart implements ILinkedWithEditorView, ITreeConten
 			}
 		});
 	}
-
-
 
 }

@@ -18,7 +18,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.PlatformUI;
 
 import com.abapblog.classicOutline.api.ApiCallerFactory;
-import com.abapblog.classicOutline.utils.AbapReleaseFactory;
 import com.abapblog.classicOutline.utils.BackendComponentVersionFactory;
 import com.abapblog.classicOutline.views.View;
 import com.sap.adt.tools.abapsource.ui.internal.sources.editors.CompoundTextSelection;
@@ -60,7 +59,7 @@ public class TreeDoubleClickListener implements IDoubleClickListener {
 	}
 
 	private void navigateToURI(String uri, IProject project) {
-		if (uri.contains("//") || canCallSemanticURI(project)) {
+		if (uri.contains("//")) {
 			navigateUsingExternalLink(uri, project);
 		} else {
 			navigateDirectly(uri, project);
@@ -80,13 +79,14 @@ public class TreeDoubleClickListener implements IDoubleClickListener {
 	}
 
 	private boolean canCallDirectNavigationService(IProject project) {
-		return (Integer.decode(AbapReleaseFactory.getAbapRelease(project)
-				.getVersion()) > MINIMAL_BASIS_COMPONENT_VERSION_FOR_DIRECT_CALL);
+		return true;
+//		return (Integer.decode(AbapReleaseFactory.getAbapRelease(project)
+//				.getVersion()) >= MINIMAL_BASIS_COMPONENT_VERSION_FOR_DIRECT_CALL);
 	}
 
 	private boolean backendPreparedForSemanticURI(IProject project) {
 		return (BackendComponentVersionFactory.getBackendComponentVersion(project)
-				.getVersion() > MINIMAL_BACKEND_VERSION_FOR_SEMANTIC_URI);
+				.getVersion() >= MINIMAL_BACKEND_VERSION_FOR_SEMANTIC_URI);
 	}
 
 	private boolean canCallSemanticURI(IProject project) {
@@ -97,18 +97,18 @@ public class TreeDoubleClickListener implements IDoubleClickListener {
 	}
 
 	private String correctUriForNamespaces(String uri, IProject project) {
-		if (canCallSemanticURI(project)) {
-			return escapeClassName(uri);
-		}
-		if (uriContainsScreenTitleGuiStatus(uri)) {
-			try {
-				uri = uri.replace("%20", URLEncoder.encode(" ", StandardCharsets.UTF_8.toString()));
-				uri = uri.replace(" ", URLEncoder.encode(" ", StandardCharsets.UTF_8.toString()));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-
-		}
+//		if (canCallSemanticURI(project)) {
+//			return escapeClassName(uri);
+//		}
+//		if (uriContainsScreenTitleGuiStatus(uri)) {
+//			try {
+//				uri = URLDecoder.decode(uri, StandardCharsets.UTF_8.toString());
+//				uri = URLEncoder.encode(uri, StandardCharsets.UTF_8.toString());
+//			} catch (UnsupportedEncodingException e) {
+//				e.printStackTrace();
+//			}
+//
+//		}
 		uri = escapeClassName(uri);
 		return uri;
 	}
@@ -175,7 +175,7 @@ public class TreeDoubleClickListener implements IDoubleClickListener {
 					uri = adtObject.getUri().toString();
 
 			} catch (AbapNavigationException e) {
-				e.printStackTrace();
+				e.getLocalizedMessage();
 			}
 		}
 		return uri;

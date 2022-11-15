@@ -73,4 +73,12 @@
                name="Classic Outline">
          </page>
       </extension>
+      <extension
+            point="org.eclipse.help.toc">
+         <toc
+               category="ADT Classic Outline"
+               file="toc.xml"
+               primary="true">
+         </toc>
+      </extension>
 </plugin>

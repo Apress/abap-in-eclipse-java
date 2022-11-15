@@ -42,7 +42,7 @@ public class TreeCellLabelProvider extends StyledCellLabelProvider {
 		int numberOfElements = 0;
 		for (TreeNode child : parent.getChildren()) {
 			try {
-				if (!(child instanceof TreeParent) || isChildALocalClass(child)) {
+				if (!(child instanceof TreeParent) || isChildALocalClass(child) || isChildAClassMethod(child)) {
 					++numberOfElements;
 				}
 			} catch (Exception e) {

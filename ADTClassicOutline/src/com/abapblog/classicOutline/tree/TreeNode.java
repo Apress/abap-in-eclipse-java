@@ -177,7 +177,7 @@ public class TreeNode implements IAdaptable {
 		} else if (typeInfo != null) {
 			return typeInfo.getImage();
 		} else if (getType().contains("PG") || getType().contains("PS") || getType().contains("PC")
-				|| getType().contains("PZ")) {
+				|| getType().contains("PZ") || getType().equals("CT") || getType().equals("OT")) {
 			return com.sap.adt.tools.core.ui.Activator.getDefault()
 					.getImage(com.sap.adt.tools.core.ui.Activator.IMG_OBJECT_VISUAL_INTEGRATED);
 		} else {

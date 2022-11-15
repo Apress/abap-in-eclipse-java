@@ -84,6 +84,10 @@ public class RfcCaller implements IApiCaller {
 			parametersTable.setValue("NAME", PreferenceConstants.P_LOAD_ALL_LEVELS_OF_SUBCLASSES);
 			parametersTable.setValue("VALUE",
 					parseToAbapBool(store.getBoolean(PreferenceConstants.P_LOAD_ALL_LEVELS_OF_SUBCLASSES)));
+			parametersTable.appendRow();
+			parametersTable.setValue("NAME", PreferenceConstants.P_LOAD_ALL_LEVELS_OF_REDEFINITIONS);
+			parametersTable.setValue("VALUE",
+					parseToAbapBool(store.getBoolean(PreferenceConstants.P_LOAD_ALL_LEVELS_OF_REDEFINITIONS)));
 
 		} catch (Exception e) {
 			// PARAMETERS table may not be available on the backend

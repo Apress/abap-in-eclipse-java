@@ -31,7 +31,8 @@ Require-Bundle: org.eclipse.ui,
  com.sap.adt.activation.ui,
  org.eclipse.jface.text;bundle-version="3.18.100",
  com.sap.adt.tools.abapsource,
- com.sap.adt.atc.ui
+ com.sap.adt.atc.ui,
+ org.eclipse.help
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8,
  JavaSE-15
 Automatic-Module-Name: com.abapblog.classicOutline
