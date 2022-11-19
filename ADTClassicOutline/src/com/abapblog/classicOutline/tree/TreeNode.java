@@ -177,7 +177,15 @@ public class TreeNode implements IAdaptable {
 		} else if (typeInfo != null) {
 			return typeInfo.getImage();
 		} else if (getType().contains("PG") || getType().contains("PS") || getType().contains("PC")
-				|| getType().contains("PZ") || getType().equals("CT") || getType().equals("OT")) {
+				|| getType().contains("PZ") || getType().equals("CT") || getType().equals("OT")
+				|| getType().equals("CMO") || getType().equals("OMO") || getType().equals("CDH")
+				|| getType().equals("ODH") || getType().equals("CWO") || getType().equals("OWO")
+				|| getType().equals("C5F") || getType().equals("O5F") || getType().equals("C5I")
+				|| getType().equals("O5I") || getType().equals("CQ0Q") || getType().equals("OQ0Q")
+				|| getType().equals("B5") || getType().equals("BW") || getType().equals("CXI")
+				|| getType().equals("OXI") || getType().equals("CAD") || getType().equals("OAD")
+
+		) {
 			return com.sap.adt.tools.core.ui.Activator.getDefault()
 					.getImage(com.sap.adt.tools.core.ui.Activator.IMG_OBJECT_VISUAL_INTEGRATED);
 		} else {
@@ -508,6 +516,11 @@ public class TreeNode implements IAdaptable {
 		case "CVT":
 		case "OVT":
 			wbType = "XSLT/VT";
+			break;
+
+		case "CDG":
+		case "ODG":
+			wbType = "TYPE/DG";
 			break;
 
 		default: {

@@ -149,7 +149,9 @@ public class View extends ViewPart implements ILinkedWithEditorView, ITreeConten
 		createColumns(viewer);
 		viewer.setLabelProvider(new TreeCellLabelProvider());
 		createGridData(viewer);
-		viewer.addDoubleClickListener(new TreeDoubleClickListener());
+		TreeDoubleClickListener doubleClickListener = new TreeDoubleClickListener();
+		viewer.addDoubleClickListener(doubleClickListener);
+		viewer.addSelectionChangedListener(doubleClickListener);
 		viewer.expandToLevel(2);
 		createAndRegisterMenu(viewer);
 	}

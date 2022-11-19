@@ -13,6 +13,15 @@
             name="Classic Outline"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            class="com.abapblog.classicOutline.changelog.ChangeLogView"
+            icon="platform:/plugin/org.eclipse.ui.views.log/icons/elcl16/import_log.png"
+            id="com.abapblog.classicOutline.changelogview"
+            inject="false"
+            name="Classic Outline Changelog"
+            restorable="false">
+      </view>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

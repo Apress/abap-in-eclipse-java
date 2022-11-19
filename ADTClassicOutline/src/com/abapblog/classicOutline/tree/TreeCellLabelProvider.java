@@ -17,14 +17,21 @@ public class TreeCellLabelProvider extends StyledCellLabelProvider {
 		if (element instanceof TreeNode) {
 			TreeNode node = (TreeNode) element;
 			StyledString styledString = new StyledString(node.getName());
-
+			Boolean haveRedefinitions = false;
 			if (node instanceof TreeParent) {
 				String counter = "";
 				counter = " " + addNumberOfChildrenToDecoration(counter, (TreeParent) node);
 				styledString.append(counter, StyledString.COUNTER_STYLER);
+				if (isChildAClassMethod(node))
+					haveRedefinitions = true;
 			}
-			String decoration = " " + node.getDescription(); //$NON-NLS-1$
+			String decoration = " " + node.getDescription();
 			styledString.append(decoration, StyledString.DECORATIONS_STYLER);
+			if (haveRedefinitions) {
+				String redefintions = " (have redefinitions)";
+				styledString.append(redefintions, StyledString.QUALIFIER_STYLER);
+			}
+
 			cell.setText(styledString.toString());
 			cell.setStyleRanges(styledString.getStyleRanges());
 			cell.setImage(node.getImage());
@@ -34,7 +41,8 @@ public class TreeCellLabelProvider extends StyledCellLabelProvider {
 	}
 
 	private String addNumberOfChildrenToDecoration(String decoration, TreeParent parent) {
-
+		if (isChildAClassMethod(parent))
+			return "(" + getElementChilderNumber(parent) + ")" + decoration;
 		return "(" + getElementChilderNumber(parent) + ")" + decoration;
 	}
 
@@ -42,7 +50,8 @@ public class TreeCellLabelProvider extends StyledCellLabelProvider {
 		int numberOfElements = 0;
 		for (TreeNode child : parent.getChildren()) {
 			try {
-				if (!(child instanceof TreeParent) || isChildALocalClass(child) || isChildAClassMethod(child)) {
+				if (!(child instanceof TreeParent) || isChildALocalClassOrInterface(child)
+						|| isChildAClassMethod(child)) {
 					++numberOfElements;
 				}
 			} catch (Exception e) {
@@ -52,7 +61,7 @@ public class TreeCellLabelProvider extends StyledCellLabelProvider {
 
 		for (TreeNode child : parent.getChildren()) {
 			try {
-				if (!isChildAClassMethod(child) && !isChildALocalClass(child))
+				if (!isChildAClassMethod(child) && !isChildALocalClassOrInterface(child))
 					numberOfElements = numberOfElements + getElementChilderNumber((TreeParent) child);
 			} catch (Exception e) {
 
@@ -66,10 +75,12 @@ public class TreeCellLabelProvider extends StyledCellLabelProvider {
 		return child.getType().equals("OOM");
 	}
 
-	private boolean isChildALocalClass(TreeNode child) {
+	private boolean isChildALocalClassOrInterface(TreeNode child) {
 		switch (child.getType()) {
 		case "OOL":
-		case "OPL": {
+		case "OPL":
+		case "OPN":
+		case "OON": {
 			return true;
 		}
 		}

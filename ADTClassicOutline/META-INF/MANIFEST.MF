@@ -4,6 +4,7 @@ Bundle-Name: Classic Outline
 Bundle-SymbolicName: com.abapblog.classicOutline;singleton:=true
 Bundle-Version: 1.0.2.qualifier
 Bundle-Activator: com.abapblog.classicOutline.Activator
+Eclipse-BundleShape: dir
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  com.sap.conn.jco,

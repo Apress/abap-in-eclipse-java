@@ -14,7 +14,9 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ui.PlatformUI;
 
 import com.abapblog.classicOutline.api.ApiCallerFactory;
@@ -32,7 +34,7 @@ import com.sap.adt.tools.core.ui.editors.IAdtFormEditor;
 import com.sap.adt.tools.core.ui.navigation.AdtNavigationServiceFactory;
 
 @SuppressWarnings("restriction")
-public class TreeDoubleClickListener implements IDoubleClickListener {
+public class TreeDoubleClickListener implements IDoubleClickListener, ISelectionChangedListener {
 
 	private static final int MINIMAL_BASIS_COMPONENT_VERSION_FOR_DIRECT_CALL = 750;
 	private static final int MINIMAL_BACKEND_VERSION_FOR_SEMANTIC_URI = 1;
@@ -135,7 +137,8 @@ public class TreeDoubleClickListener implements IDoubleClickListener {
 	}
 
 	private String getDefinitionURI(TreeNode selectedNode, String uri, IProject project) {
-		if ((selectedNode.getType().equals("OOLD") && !selectedNode.getLinkedObject().getType().contains("CLAS"))) {
+		if ((selectedNode.getType().equals("OOLD"))) {// && !selectedNode.getLinkedObject().getType().contains("CLAS")))
+														// {
 			TreeContentProvider contentProvider = (TreeContentProvider) View.getCurrentTree().getViewer()
 					.getContentProvider();
 			ObjectTree objectTree = (ObjectTree) contentProvider.getInvisibleRoot();
@@ -162,7 +165,7 @@ public class TreeDoubleClickListener implements IDoubleClickListener {
 					navigateToURI(uri, project);
 					editor = (IAdtFormEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
 							.getActiveEditor();
-					navigationServiceUri = getURIWithStartAndEnd(navigationServiceUri, editor);
+					navigationServiceUri = getURIWithStartAndEnd(navigationServiceUri, editor, uri);
 
 				}
 				if (editor == null)
@@ -189,18 +192,26 @@ public class TreeDoubleClickListener implements IDoubleClickListener {
 		return filterValue;
 	}
 
-	private URI getURIWithStartAndEnd(URI navigationServiceUri, IAdtFormEditor editor) {
+	private URI getURIWithStartAndEnd(URI navigationServiceUri, IAdtFormEditor editor, String uri) {
 		String includeUri;
 		try {
 			CompoundTextSelection selection = (CompoundTextSelection) PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow().getActivePage().getSelection();
-
+			AbapSourcePage abapSourcePage = editor.getAdapter(AbapSourcePage.class);
 			IDocument document = editor.getAdapter(AbapSourcePage.class).getDocument();
 			int startLine = selection.getStartLine();
 			int beginningOfName = selection.getOffset() - document.getLineOffset(startLine);
 			startLine = startLine + 1;
-			includeUri = "/sap/bc/adt/" + getPath(editor).toString() + "/source/main#start%3D" + startLine + "%2C"
-					+ beginningOfName + "%3Bend%3D" + startLine + "%2C" + beginningOfName;
+			if (uri.contains("/oo/")) {
+				if (uri.contains("start"))
+					return navigationServiceUri = URI.create(uri);
+				includeUri = uri.replaceAll("#(.*)", "#start%3D" + startLine + "%2C" + beginningOfName + "%3Bend%3D"
+						+ startLine + "%2C" + beginningOfName);
+			} else {
+				includeUri = "/sap/bc/adt/" + getPath(editor).toString() + "/source/main#start%3D" + startLine + "%2C"
+						+ beginningOfName + "%3Bend%3D" + startLine + "%2C" + beginningOfName;
+			}
+
 			navigationServiceUri = URI.create(includeUri);
 		} catch (BadLocationException e) {
 			e.printStackTrace();
@@ -213,5 +224,30 @@ public class TreeDoubleClickListener implements IDoubleClickListener {
 		path = path.removeFirstSegments(2);
 		path = path.removeLastSegments(1);
 		return path;
+	}
+
+	@Override
+	public void selectionChanged(SelectionChangedEvent event) {
+		IStructuredSelection thisSelection = (IStructuredSelection) event.getSelection();
+		TreeNode selectedNode = (TreeNode) thisSelection.getFirstElement();
+		if (selectedNode == null)
+			return;
+		String uri = "";
+		if (selectedNode.getType().startsWith("C"))
+			return;
+		IProject project = selectedNode.getLinkedObject().getProject();
+		uri = getDefinitionURI(selectedNode, uri, project);
+		if (uri.equals(""))
+			uri = ApiCallerFactory.getCaller().getUriForTreeNode(selectedNode);
+
+		if (uri != null && !uri.isEmpty() && !uri.equals("")) {
+			uri = correctUriForNamespaces(uri, project);
+			try {
+				navigateToURI(uri, project);
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+
+		}
 	}
 }

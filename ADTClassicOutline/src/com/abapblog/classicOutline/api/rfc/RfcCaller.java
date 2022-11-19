@@ -90,7 +90,7 @@ public class RfcCaller implements IApiCaller {
 					parseToAbapBool(store.getBoolean(PreferenceConstants.P_LOAD_ALL_LEVELS_OF_REDEFINITIONS)));
 
 		} catch (Exception e) {
-			// PARAMETERS table may not be available on the backend
+			e.getLocalizedMessage();
 		}
 	}
 
