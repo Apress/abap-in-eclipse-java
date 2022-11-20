@@ -24,11 +24,15 @@ public class AbapPageLoadListener extends AbstractAbapSourcePageExtensionProcess
 			return;
 		}
 		try {
-			for (int i = 0; i < listeners.size(); i++) {
-				listeners.get(i).pageLoaded(sourcePage);
-			}
+			listeners.forEach(listener -> {
+				if (listener != null) {
+
+					listener.pageLoaded(sourcePage);
+					removeListener(listener);
+
+				}
+			});
 		} catch (Exception e) {
-			System.out.println(e.toString());
 		}
 	}
 }

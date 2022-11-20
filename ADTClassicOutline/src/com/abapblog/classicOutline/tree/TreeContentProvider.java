@@ -7,7 +7,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.ui.IEditorPart;
 
 import com.abapblog.classicOutline.api.ApiCallerFactory;
-import com.abapblog.classicOutline.tree.listeners.ITreeContentRefreshListener;
 import com.abapblog.classicOutline.utils.ClassPageChangeListener;
 import com.abapblog.classicOutline.utils.ProjectUtility;
 import com.abapblog.classicOutline.views.LinkedObject;
@@ -20,16 +19,15 @@ public class TreeContentProvider implements ITreeContentProvider {
 	private Object[] elements;
 	private boolean refreshTree = false;
 	private org.eclipse.jface.viewers.TreePath[] treePaths;
-	private List<ITreeContentRefreshListener> eventListeners;
-	private OutlineFilteredTree filteredTree;
-	private Object[] expandedNodes;
+	// private View view;
 
-	public TreeContentProvider(LinkedObject linkedObject, OutlineFilteredTree filteredTree, Object[] expandedNodes) {
+	public TreeContentProvider(LinkedObject linkedObject) {
 		super();
 		this.setLinkedObject(linkedObject);
-		this.filteredTree = filteredTree;
-		this.expandedNodes = expandedNodes;
-		this.eventListeners = new ArrayList<ITreeContentRefreshListener>();
+
+		// addClassPageListener();
+		// setView(view);
+
 	}
 
 	private void addClassPageListener() {
@@ -78,41 +76,12 @@ public class TreeContentProvider implements ITreeContentProvider {
 
 		try {
 			invisibleRoot = new TreeParent(getLinkedObject(), null);
-			if (getLinkedObject() == null || getLinkedObject().isEmpty()) {
-				invisibleRoot.addChild(new TreeNode(getLinkedObject(), getUnsupportedEditorChild()));
+			if (getLinkedObject() == null || getLinkedObject().isEmpty())
 				return;
-			}
-			invisibleRoot.addChild(new TreeNode(getLinkedObject(), getLoadingChild()));
-			TreeContentProvider contentProvider = this;
-			Thread thread = new Thread("GetClassicOutlineViewer") {
-				@Override
-				public void run() {
-					invisibleRoot = ApiCallerFactory.getCaller().getObjectTree(getLinkedObject(), refresh);
-					eventListeners.forEach((el) -> el.ContentRefreshed(contentProvider));
-				}
-			};
-			thread.start();
-
+			invisibleRoot = ApiCallerFactory.getCaller().getObjectTree(getLinkedObject(), refresh);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-	}
-
-	private SourceNode getLoadingChild() {
-		SourceNode loading = new SourceNode(0);
-		loading.setText1("Loading...");
-		loading.setText2("data from backend");
-		loading.setType("LOAD");
-		return loading;
-	}
-
-	private SourceNode getUnsupportedEditorChild() {
-		SourceNode loading = new SourceNode(0);
-		loading.setText1("This editor is not supported");
-		loading.setText2("");
-		loading.setType("ERROR");
-		return loading;
 	}
 
 	public Object[] getElements() {
@@ -187,15 +156,4 @@ public class TreeContentProvider implements ITreeContentProvider {
 		return invisibleRoot;
 	}
 
-	public OutlineFilteredTree getFilteredTree() {
-		return filteredTree;
-	}
-
-	public Object[] getExpandedNodes() {
-		return expandedNodes;
-	}
-
-	public void addContentRefreshListener(ITreeContentRefreshListener evtListener) {
-		this.eventListeners.add(evtListener);
-	}
 }
