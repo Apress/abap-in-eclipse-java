@@ -20,8 +20,7 @@ public class OutlineFilteredTree extends FilteredTree {
 			boolean useFastHashLookup, LinkedObject linkdedObject) {
 		super(parent, treeStyle, filter, useNewLook, useFastHashLookup);
 		addLinkedObject(linkdedObject);
-		if (linkdedObject != null)
-			linkedProject = linkdedObject.getProject();
+		linkedProject = linkdedObject.getProject();
 		getViewer().addTreeListener(treeExpansionListener);
 	}
 
@@ -34,15 +33,13 @@ public class OutlineFilteredTree extends FilteredTree {
 	}
 
 	public Boolean containsObject(LinkedObject linkedObject) {
-		if (linkedProject != null && linkedObject != null) {
+		if (linkedProject != null) {
 			if (!linkedProject.getName().equals(linkedObject.getProject().getName()))
 				return false;
 		}
 
 		if (linkedObjects.contains(linkedObject))
 			return true;
-		if (linkedObject == null)
-			return false;
 
 		int count = 0;
 		while (linkedObjects.size() > count) {

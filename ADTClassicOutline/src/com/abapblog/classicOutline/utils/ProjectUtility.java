@@ -52,8 +52,8 @@ public class ProjectUtility {
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			IWorkbenchWindow window = page.getWorkbenchWindow();
 			ISelection adtSelection = window.getSelectionService().getSelection();
-			IProject project = ProjectUtil.getActiveAdtCoreProject(adtSelection, null, null, null);
-//					IAdtCoreProject.ABAP_PROJECT_NATURE);
+			IProject project = ProjectUtil.getActiveAdtCoreProject(adtSelection, null, null,
+					IAdtCoreProject.ABAP_PROJECT_NATURE);
 			return project;
 		} catch (Exception e) {
 			return null;
@@ -71,6 +71,11 @@ public class ProjectUtility {
 			IAdtFormEditor formEditor = (IAdtFormEditor) editor;
 			IAdtObject model = formEditor.getModel();
 			if (model != null) {
+//				List<EditorSource> editorSources = null;
+//				IAdtStructuralInfoService service = AbapSourceUi.getInstance().getOrCreateStructuralInfoService();
+//				IObjectStructureElement objectStructure = service.getOrLoadObjectStructure(formEditor.getModelFile(),
+//						model, editorSources, true, null);
+//				Map attribures = objectStructure.getAttributes();
 				int count = 0;
 				IProject project = getActiveAdtProject();
 				while (View.linkedObjects.size() > count) {
